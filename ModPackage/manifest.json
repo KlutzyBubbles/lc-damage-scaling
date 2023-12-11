@@ -1,0 +1,9 @@
+{
+    "name": "DamageScaling",
+    "version_number": "1.0.0",
+    "website_url": "https://github.com/KlutzyBubbles/lc-damage-scaling",
+    "description": "Adds config variables to use as damage multipliers. E.g. setting gravity damage to 0",
+    "dependencies": [
+        "BepInEx-BepInExPack-5.4.2100"
+    ]
+}

@@ -1,0 +1,98 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - v*
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Zip Folder
+        run: zip -r ${{ github.event.repository.name }}.zip ModPackage -x "*.git*" ".github/*" -j
+
+      - name: Get commits since version
+        id: commits
+        run: echo "value=$(git log "$(git describe --tags --abbrev=0)..HEAD" --no-merges --oneline)" >> $GITHUB_STATE
+      
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          draft: true
+          body: |
+            ${{ steps.commits.outputs.value }}
+          files: ${{ github.event.repository.name }}.zip
+
+      - name: Set Manifest
+        id: set_manifest
+        run: |
+          content=`cat ./ModPackage/manifest.json`
+          # the following lines are only required for multi line json
+          content="${content//'%'/'%25'}"
+          content="${content//$'\n'/'%0A'}"
+          content="${content//$'\r'/'%0D'}"
+          # end of optional handling for multi line json
+          echo "packageJson=$content" >> $GITHUB_STATE
+
+      - name: echo content
+        run: |
+          content=`cat ./ModPackage/manifest.json`
+          echo "::debug::$content"
+
+      - name: echo content trunked
+        run: |
+          content=`cat ./ModPackage/manifest.json`
+          content="${content//'%'/'%25'}"
+          content="${content//$'\n'/'%0A'}"
+          content="${content//$'\r'/'%0D'}"
+          echo "::debug::$content"
+
+      # - name: echo packageJson
+      #   run: echo "::debug::${{ steps.set_manifest.outputs.packageJson }}"
+# 
+      # - name: Test with version
+      #   run: |
+      #     echo "${{ fromJson(steps.set_manifest.outputs.packageJson).version }}"
+
+      - name: Get manifest properties
+        id: manifest
+        uses: zoexx/github-action-json-file-properties@release
+        with:
+          file_path: "./ModPackage/manifest.json"
+  
+      - name: echo version
+        run: echo "::debug::${{ steps.manifest.outputs.version_number }}"
+
+      - name: Format version number
+        id: version
+        run: echo "version=${GITHUB_REF_NAME#v}" >> $GITHUB_STATE
+
+      - name: Publish
+        uses: GreenTF/upload-thunderstore-package@v4
+        with:
+          namespace: AngoMango
+          description: ${{ steps.manifest.outputs.description }}
+          token: ${{ secrets.THUNDERSTORE_TOKEN }}
+          name: ${{ steps.manifest.outputs.name }}
+          version: ${{ github.ref_name }}
+          community: lethal-company
+          file: ${{ github.event.repository.name }}.zip
+          repo: thunderstore.io
+          categories: |
+            modpacks
+            serverside
+            clientside
+            suits
+            items
+            cosmetics
+            audio
