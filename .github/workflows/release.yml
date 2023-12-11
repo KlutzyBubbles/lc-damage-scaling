@@ -33,37 +33,6 @@ jobs:
             ${{ steps.commits.outputs.value }}
           files: ${{ github.event.repository.name }}.zip
 
-      #- name: Set Manifest
-      #  id: set_manifest
-      #  run: |
-      #    content=`cat ./ModPackage/manifest.json`
-      #    # the following lines are only required for multi line json
-      #    content="${content//'%'/'%25'}"
-      #    content="${content//$'\n'/'%0A'}"
-      #    content="${content//$'\r'/'%0D'}"
-      #    # end of optional handling for multi line json
-      #    echo "packageJson=$content" >> $GITHUB_STATE
-
-      #- name: echo content
-      #  run: |
-      #    content=`cat ./ModPackage/manifest.json`
-      #    echo "::debug::$content"
-
-      #- name: echo content trunked
-      #  run: |
-      #    content=`cat ./ModPackage/manifest.json`
-      #    content="${content//'%'/'%25'}"
-      #    content="${content//$'\n'/'%0A'}"
-      #    content="${content//$'\r'/'%0D'}"
-      #    echo "::debug::$content"
-
-      # - name: echo packageJson
-      #   run: echo "::debug::${{ steps.set_manifest.outputs.packageJson }}"
-# 
-      # - name: Test with version
-      #   run: |
-      #     echo "${{ fromJson(steps.set_manifest.outputs.packageJson).version }}"
-
       - name: Get manifest properties
         id: manifest
         uses: zoexx/github-action-json-file-properties@release
@@ -91,5 +60,4 @@ jobs:
           # categories: |
           #   mods
           #   serverside
-          #   clientside
           #   tools
