@@ -80,7 +80,7 @@ jobs:
       - name: Publish
         uses: GreenTF/upload-thunderstore-package@v4
         with:
-          namespace: AngoMango
+          namespace: KlutzyBubbles
           description: ${{ steps.manifest.outputs.description }}
           token: ${{ secrets.THUNDERSTORE_TOKEN }}
           name: ${{ steps.manifest.outputs.name }}
@@ -89,10 +89,7 @@ jobs:
           file: ${{ github.event.repository.name }}.zip
           repo: thunderstore.io
           categories: |
-            modpacks
+            mods
             serverside
             clientside
-            suits
-            items
-            cosmetics
-            audio
+            tools
